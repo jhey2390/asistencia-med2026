@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registro de asistencia - Acompañamiento MED 2026</title>
+  <style>
+    :root {
+      --minedu-red:#d91023; --ink:#172033; --muted:#667085; --line:#d0d5dd;
+      --bg:#f5f7fb; --card:#ffffff; --ok:#087443; --bad:#b42318; --blue:#0b3a75;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Arial, Helvetica, sans-serif; background:linear-gradient(135deg,#f7f8fb,#edf2f7); color:var(--ink); }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 44px; }
+    header { background:var(--card); border:1px solid #eaecf0; border-radius:22px; padding:22px; box-shadow:0 12px 28px rgba(16,24,40,.08); margin-bottom:18px; }
+    .brand { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+    .flag { width:54px; height:38px; border-radius:7px; background:linear-gradient(90deg,#d91023 0 33%, #fff 33% 66%, #d91023 66%); border:1px solid #d0d5dd; }
+    .kicker { color:var(--minedu-red); font-weight:700; letter-spacing:.04em; font-size:13px; text-transform:uppercase; }
+    h1 { font-size: clamp(24px, 3vw, 36px); margin:4px 0 8px; line-height:1.12; }
+    p { color:var(--muted); line-height:1.5; margin:0; }
+    form { background:var(--card); border:1px solid #eaecf0; border-radius:22px; padding:22px; box-shadow:0 12px 28px rgba(16,24,40,.08); }
+    .grid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:16px; }
+    .full { grid-column:1 / -1; }
+    label { display:block; font-weight:700; margin-bottom:7px; font-size:14px; }
+    input, select { width:100%; min-height:44px; border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:15px; background:#fff; color:var(--ink); outline:none; }
+    input:focus, select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(11,58,117,.12); }
+    input[readonly] { background:#f2f4f7; color:#344054; }
+    .hint { font-size:12px; color:var(--muted); margin-top:5px; }
+    .section-title { grid-column:1 / -1; margin:8px 0 0; padding-top:10px; border-top:1px solid #eaecf0; color:var(--blue); font-size:17px; font-weight:800; }
+    .actions { display:flex; gap:12px; align-items:center; margin-top:20px; flex-wrap:wrap; }
+    button { border:0; border-radius:14px; padding:13px 18px; font-weight:800; cursor:pointer; font-size:15px; }
+    .primary { background:var(--minedu-red); color:white; }
+    .secondary { background:#eef2f6; color:#344054; }
+    .msg { padding:12px 14px; border-radius:14px; margin-top:16px; display:none; font-weight:700; }
+    .msg.ok { display:block; background:#ecfdf3; color:var(--ok); border:1px solid #abefc6; }
+    .msg.bad { display:block; background:#fef3f2; color:var(--bad); border:1px solid #fecdca; }
+    .req { color:var(--minedu-red); }
+    @media (max-width:760px) { .grid { grid-template-columns:1fr; } header, form { padding:18px; border-radius:18px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><div class="flag" aria-hidden="true"></div><div><div class="kicker">MINEDU · MED 2026</div><strong>Registro de asistencia</strong></div></div>
+      <h1>Encuesta de asistencia a capacitación</h1>
+      <p>Completa tus datos para registrar tu participación. El identificador del acompañamiento se carga automáticamente desde el enlace recibido.</p>
+    </header>
+
+    <form id="frmAsistencia" autocomplete="on">
+      <div class="grid">
+        <div class="full">
+          <label for="id_acomp">Identificador del acompañamiento <span class="req">*</span></label>
+          <input id="id_acomp" name="id_acomp" type="text" readonly required />
+          <div class="hint">Este valor viene en la URL, por ejemplo: <b>?id_acomp=ACOMP-20260601-001</b></div>
+        </div>
+
+        <div class="section-title">Datos del participante</div>
+        <div>
+          <label for="nombres">Nombres <span class="req">*</span></label>
+          <input id="nombres" name="nombres" required maxlength="120" placeholder="Ej. Juan Carlos" />
+        </div>
+        <div>
+          <label for="apellidos">Apellidos <span class="req">*</span></label>
+          <input id="apellidos" name="apellidos" required maxlength="160" placeholder="Ej. Pérez Flores" />
+        </div>
+        <div>
+          <label for="tip_doi">Tipo de documento <span class="req">*</span></label>
+          <select id="tip_doi" name="tip_doi" required>
+            <option value="">Seleccione...</option>
+            <option value="DNI">DNI</option>
+            <option value="CE">Carné de extranjería</option>
+            <option value="PASAPORTE">Pasaporte</option>
+          </select>
+        </div>
+        <div>
+          <label for="num_doi">Número de documento <span class="req">*</span></label>
+          <input id="num_doi" name="num_doi" required inputmode="numeric" maxlength="12" placeholder="DNI: 8 dígitos" />
+          <div class="hint">Si seleccionas DNI, debe tener exactamente 8 dígitos.</div>
+        </div>
+        <div>
+          <label for="celular">Celular <span class="req">*</span></label>
+          <input id="celular" name="celular" required inputmode="numeric" maxlength="9" pattern="[0-9]{9}" placeholder="9 dígitos" />
+        </div>
+        <div>
+          <label for="email">Correo electrónico <span class="req">*</span></label>
+          <input id="email" name="email" required type="email" maxlength="160" placeholder="correo@dominio.gob.pe" />
+        </div>
+        <div class="full">
+          <label for="cargo">Cargo <span class="req">*</span></label>
+          <select id="cargo" name="cargo" required>
+            <option value="">Seleccione...</option>
+            <option>Director/a</option>
+            <option>Subdirector/a</option>
+            <option>Docente</option>
+            <option>Profesor/a de Innovación Pedagógica - PIP</option>
+            <option>Responsable de tecnología</option>
+            <option>Especialista DRE/GRE</option>
+            <option>Especialista UGEL</option>
+            <option>Otro</option>
+          </select>
+        </div>
+
+        <div class="section-title">Datos de la institución educativa</div>
+        <div class="full">
+          <label for="nomb_ie">Nombre de la institución educativa <span class="req">*</span></label>
+          <input id="nomb_ie" name="nomb_ie" required maxlength="220" placeholder="Nombre de la IE" />
+        </div>
+        <div>
+          <label for="cod_mod">Código modular <span class="req">*</span></label>
+          <input id="cod_mod" name="cod_mod" required inputmode="numeric" maxlength="7" pattern="[0-9]{7}" placeholder="7 dígitos" />
+        </div>
+        <div>
+          <label for="dre">DRE <span class="req">*</span></label>
+          <select id="dre" name="dre" required><option value="">Seleccione DRE...</option></select>
+        </div>
+        <div class="full">
+          <label for="ugel">UGEL <span class="req">*</span></label>
+          <select id="ugel" name="ugel" required disabled><option value="">Primero seleccione una DRE...</option></select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" type="submit" id="btnEnviar">Enviar asistencia</button>
+        <button class="secondary" type="reset">Limpiar</button>
+      </div>
+      <div id="mensaje" class="msg" role="alert"></div>
+    </form>
+  </div>
+
+<script>
+  // 1) Reemplaza esta URL por la URL del disparador HTTP de Power Automate.
+  const POWER_AUTOMATE_URL = "PEGAR_AQUI_URL_HTTP_POST_POWER_AUTOMATE";
+
+  // 2) DRE/UGEL cargadas desde el Excel adjunto.
+  const DRE_UGEL = {
+  "DRE AMAZONAS": [
+    "UGEL BAGUA",
+    "UGEL BONGARÁ",
+    "UGEL CHACHAPOYAS",
+    "UGEL IBIR-IMAZA",
+    "UGEL INTERCULTURAL BILINGÜE CENEPA",
+    "UGEL INTERCULTURAL BILINGÜE CONDORCANQUI",
+    "UGEL INTERCULTURAL BILINGÜE RIO SANTIAGO",
+    "UGEL LUYA",
+    "UGEL RODRÍGUEZ DE MENDOZA",
+    "UGEL UTCUBAMBA"
+  ],
+  "DRE ANCASH": [
+    "UGEL AIJA",
+    "UGEL ANTONIO RAYMONDI",
+    "UGEL ASUNCIÓN",
+    "UGEL BOLOGNESI",
+    "UGEL CARHUÁZ",
+    "UGEL CARLOS F. FITZCARRALD",
+    "UGEL CASMA",
+    "UGEL CORONGO",
+    "UGEL HUARAZ",
+    "UGEL HUARI",
+    "UGEL HUARMEY",
+    "UGEL HUAYLAS",
+    "UGEL MARISCAL LUZURIAGA",
+    "UGEL OCROS",
+    "UGEL PALLASCA",
+    "UGEL POMABAMBA",
+    "UGEL RECUAY",
+    "UGEL SANTA",
+    "UGEL SIHUAS",
+    "UGEL YUNGAY"
+  ],
+  "DRE APURIMAC": [
+    "UGEL ABANCAY",
+    "UGEL ANDAHUAYLAS",
+    "UGEL ANTABAMBA",
+    "UGEL AYMARAES",
+    "UGEL CHINCHEROS",
+    "UGEL COTABAMBAS",
+    "UGEL GRAU",
+    "UGEL HUANCARAMA"
+  ],
+  "DRE AYACUCHO": [
+    "UGEL CANGALLO",
+    "UGEL HUAMANGA",
+    "UGEL HUANCASANCOS",
+    "UGEL HUANTA",
+    "UGEL LA MAR",
+    "UGEL LUCANAS",
+    "UGEL PARINACOCHAS",
+    "UGEL PAUCAR DEL SARASARA",
+    "UGEL SUCRE",
+    "UGEL VILCASHUAMÁN",
+    "UGEL VÍCTOR FAJARDO"
+  ],
+  "DRE CAJAMARCA": [
+    "UGEL CAJABAMBA",
+    "UGEL CAJAMARCA",
+    "UGEL CELENDÍN",
+    "UGEL CHOTA",
+    "UGEL CONTUMAZÁ",
+    "UGEL CUTERVO",
+    "UGEL HUALGAYOC",
+    "UGEL JAÉN",
+    "UGEL SAN IGNACIO",
+    "UGEL SAN MARCOS",
+    "UGEL SAN MIGUEL",
+    "UGEL SAN PABLO",
+    "UGEL SANTA CRUZ"
+  ],
+  "DRE CALLAO": [
+    "UGEL CALLAO *",
+    "UGEL VENTANILLA"
+  ],
+  "DRE CUSCO": [
+    "UGEL ACOMAYO",
+    "UGEL ANTA",
+    "UGEL CALCA",
+    "UGEL CANAS",
+    "UGEL CANCHIS",
+    "UGEL CHUMBIVILCAS",
+    "UGEL CUSCO",
+    "UGEL ESPINAR",
+    "UGEL LA CONVENCIÓN",
+    "UGEL PARURO",
+    "UGEL PAUCARTAMBO",
+    "UGEL PICHARI-KIMBIRI-VILLA VIRGEN",
+    "UGEL QUISPICANCHI",
+    "UGEL URUBAMBA"
+  ],
+  "DRE HUANCAVELICA": [
+    "UGEL ACOBAMBA",
+    "UGEL ANGARAES",
+    "UGEL CASTROVIRREYNA",
+    "UGEL CHURCAMPA",
+    "UGEL HUANCAVELICA",
+    "UGEL HUAYTARÁ",
+    "UGEL SURCUBAMBA",
+    "UGEL TAYACAJA"
+  ],
+  "DRE HUANUCO": [
+    "UGEL AMBO",
+    "UGEL DOS DE MAYO",
+    "UGEL HUACAYBAMBA",
+    "UGEL HUAMALÍES",
+    "UGEL HUÁNUCO",
+    "UGEL LAURICOCHA",
+    "UGEL LEONCIO PRADO",
+    "UGEL MARAÑÓN",
+    "UGEL PACHITEA",
+    "UGEL PUERTO INCA",
+    "UGEL YAROWILCA"
+  ],
+  "DRE ICA": [
+    "UGEL CHINCHA",
+    "UGEL ICA",
+    "UGEL NAZCA",
+    "UGEL PALPA",
+    "UGEL PISCO"
+  ],
+  "DRE JUNIN": [
+    "UGEL CHANCHAMAYO",
+    "UGEL CHUPACA",
+    "UGEL CONCEPCIÓN",
+    "UGEL HUANCAYO",
+    "UGEL JAUJA",
+    "UGEL JUNÍN",
+    "UGEL PANGOA",
+    "UGEL PICHANAKI",
+    "UGEL RIO ENE - MANTARO",
+    "UGEL RIO TAMBO",
+    "UGEL SATIPO",
+    "UGEL TARMA",
+    "UGEL YAULI"
+  ],
+  "DRE LIMA METROPOLITANA": [
+    "UGEL 01 SAN JUAN DE MIRAFLORES",
+    "UGEL 02 RÍMAC",
+    "UGEL 03 BREÑA",
+    "UGEL 04 COMAS",
+    "UGEL 05 SAN JUAN DE LURIGANCHO",
+    "UGEL 06 ATE",
+    "UGEL 07 SAN BORJA"
+  ],
+  "DRE LIMA PROVINCIAS": [
+    "UGEL 08 CAÑETE",
+    "UGEL 09 HUAURA",
+    "UGEL 10 HUARAL",
+    "UGEL 11 CAJATAMBO",
+    "UGEL 12 CANTA",
+    "UGEL 13 YAUYOS",
+    "UGEL 14 OYÓN",
+    "UGEL 15 HUAROCHIRÍ",
+    "UGEL 16 BARRANCA"
+  ],
+  "DRE LORETO": [
+    "UGEL ALTO AMAZONAS-SAN LORENZO",
+    "UGEL ALTO AMAZONAS-YURIMAGUAS",
+    "UGEL DATEM DEL MARAÑON INTERCULTURAL BILINGÜE",
+    "UGEL LORETO - NAUTA",
+    "UGEL MAYNAS",
+    "UGEL PUTUMAYO",
+    "UGEL RAMÓN CASTILLA-CABALLOCOCHA",
+    "UGEL REQUENA",
+    "UGEL UCAYALI-CONTAMANA"
+  ],
+  "DRE MADRE DE DIOS": [
+    "UGEL MANU",
+    "UGEL TAHUAMANU",
+    "UGEL TAMBOPATA"
+  ],
+  "DRE MOQUEGUA": [
+    "UGEL GENERAL SÁNCHEZ CERRO",
+    "UGEL ILO",
+    "UGEL MARISCAL NIETO",
+    "UGEL SAN IGNACIO DE LOYOLA-ICHUÑA"
+  ],
+  "DRE PASCO": [
+    "UGEL DANIEL ALCIDES CARRIÓN",
+    "UGEL OXAPAMPA",
+    "UGEL PASCO",
+    "UGEL PUERTO BERMÚDEZ"
+  ],
+  "DRE PIURA": [
+    "UGEL AYABACA",
+    "UGEL CHULUCANAS",
+    "UGEL HUANCABAMBA",
+    "UGEL HUARMACA",
+    "UGEL LA UNIÓN",
+    "UGEL MORROPÓN",
+    "UGEL PAITA",
+    "UGEL PIURA",
+    "UGEL SECHURA",
+    "UGEL SULLANA",
+    "UGEL TALARA",
+    "UGEL TAMBOGRANDE"
+  ],
+  "DRE PUNO": [
+    "UGEL AZÁNGARO",
+    "UGEL CARABAYA",
+    "UGEL CHUCUITO",
+    "UGEL CRUCERO",
+    "UGEL EL COLLAO",
+    "UGEL HUANCANÉ",
+    "UGEL LAMPA",
+    "UGEL MELGAR",
+    "UGEL MOHO",
+    "UGEL PUNO",
+    "UGEL SAN ANTONIO DE PUTINA",
+    "UGEL SAN ROMÁN",
+    "UGEL SANDIA",
+    "UGEL YUNGUYO"
+  ],
+  "DRE SAN MARTIN": [
+    "UGEL BELLAVISTA",
+    "UGEL EL DORADO",
+    "UGEL HUALLAGA",
+    "UGEL LAMAS",
+    "UGEL MARISCAL CÁCERES",
+    "UGEL MOYOBAMBA",
+    "UGEL PICOTA",
+    "UGEL RIOJA",
+    "UGEL SAN MARTÍN",
+    "UGEL TOCACHE"
+  ],
+  "DRE TACNA": [
+    "UGEL CANDARAVE",
+    "UGEL JORGE BASADRE",
+    "UGEL TACNA",
+    "UGEL TARATA"
+  ],
+  "DRE TUMBES": [
+    "UGEL CONTRALMIRANTE VILLAR",
+    "UGEL TUMBES",
+    "UGEL ZARUMILLA"
+  ],
+  "DRE UCAYALI": [
+    "UGEL ATALAYA",
+    "UGEL CORONEL PORTILLO",
+    "UGEL PADRE ABAD",
+    "UGEL PURUS"
+  ],
+  "GRE AREQUIPA": [
+    "UGEL AREQUIPA NORTE",
+    "UGEL AREQUIPA SUR",
+    "UGEL CAMANÁ",
+    "UGEL CARAVELI",
+    "UGEL CASTILLA",
+    "UGEL CAYLLOMA",
+    "UGEL CONDESUYOS",
+    "UGEL ISLAY",
+    "UGEL LA JOYA",
+    "UGEL LA UNIÓN"
+  ],
+  "GRE LA LIBERTAD": [
+    "UGEL 01 EL PORVENIR",
+    "UGEL 02 LA ESPERANZA",
+    "UGEL 03 TRUJILLO NOR OESTE",
+    "UGEL 04 TRUJILLO SUR ESTE",
+    "UGEL ASCOPE",
+    "UGEL BOLIVAR",
+    "UGEL CHEPÉN",
+    "UGEL GRAN CHIMÚ",
+    "UGEL JULCÁN",
+    "UGEL OTUZCO",
+    "UGEL PACASMAYO",
+    "UGEL PATAZ",
+    "UGEL SANTIAGO DE CHUCO",
+    "UGEL SÁNCHEZ CARRIÓN",
+    "UGEL VIRÚ"
+  ],
+  "GRE LAMBAYEQUE": [
+    "UGEL CHICLAYO",
+    "UGEL FERREÑAFE",
+    "UGEL LAMBAYEQUE"
+  ]
+};
+
+  const $ = (id) => document.getElementById(id);
+  const form = $("frmAsistencia");
+  const msg = $("mensaje");
+  const dre = $("dre");
+  const ugel = $("ugel");
+  const btn = $("btnEnviar");
+
+  function setMsg(type, text) {
+    msg.className = "msg " + type;
+    msg.textContent = text;
+  }
+
+  function normalizarTexto(valor) {
+    return String(valor || "").trim().replace(/\s+/g, " ").toUpperCase();
+  }
+
+  function getParam(nombre) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(nombre) || "";
+  }
+
+  function cargarIdAcomp() {
+    const valor = getParam("id_acomp") || getParam("acomp") || getParam("id");
+    $("id_acomp").value = valor.trim();
+    if (!valor) {
+      setMsg("bad", "El enlace no contiene id_acomp. Usa un enlace como: encuesta.html?id_acomp=ACOMP-20260601-001");
+    }
+  }
+
+  function cargarDre() {
+    Object.keys(DRE_UGEL).sort().forEach(nombreDre => {
+      const opt = document.createElement("option");
+      opt.value = nombreDre;
+      opt.textContent = nombreDre;
+      dre.appendChild(opt);
+    });
+  }
+
+  function cargarUgel(nombreDre) {
+    ugel.innerHTML = "";
+    const base = document.createElement("option");
+    base.value = "";
+    base.textContent = nombreDre ? "Seleccione UGEL..." : "Primero seleccione una DRE...";
+    ugel.appendChild(base);
+    if (!nombreDre) { ugel.disabled = true; return; }
+    (DRE_UGEL[nombreDre] || []).forEach(nombreUgel => {
+      const opt = document.createElement("option");
+      opt.value = nombreUgel;
+      opt.textContent = nombreUgel;
+      ugel.appendChild(opt);
+    });
+    ugel.disabled = false;
+  }
+
+  function validar() {
+    const tip = $("tip_doi").value;
+    const doc = $("num_doi").value.trim();
+    if (!$("id_acomp").value.trim()) return "Falta el identificador id_acomp en el enlace.";
+    if (tip === "DNI" && !/^\d{8}$/.test(doc)) return "El DNI debe tener exactamente 8 dígitos.";
+    if (!/^\d{9}$/.test($("celular").value.trim())) return "El celular debe tener exactamente 9 dígitos.";
+    if (!/^\d{7}$/.test($("cod_mod").value.trim())) return "El código modular debe tener exactamente 7 dígitos.";
+    return "";
+  }
+
+  function formToPayload() {
+    return {
+      id_acomp: $("id_acomp").value.trim(),
+      nombres: normalizarTexto($("nombres").value),
+      apellidos: normalizarTexto($("apellidos").value),
+      tip_doi: $("tip_doi").value,
+      num_doi: $("num_doi").value.trim(),
+      celular: $("celular").value.trim(),
+      email: $("email").value.trim().toLowerCase(),
+      cargo: $("cargo").value,
+      nomb_ie: normalizarTexto($("nomb_ie").value),
+      cod_mod: $("cod_mod").value.trim(),
+      dre: $("dre").value,
+      ugel: $("ugel").value,
+      fecha_registro_cliente: new Date().toISOString(),
+      origen: "GitHub Pages"
+    };
+  }
+
+  dre.addEventListener("change", () => cargarUgel(dre.value));
+
+  ["num_doi", "celular", "cod_mod"].forEach(id => {
+    $(id).addEventListener("input", e => e.target.value = e.target.value.replace(/\D/g, ""));
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.className = "msg";
+    const error = validar();
+    if (error) { setMsg("bad", error); return; }
+    if (POWER_AUTOMATE_URL.includes("PEGAR_AQUI")) {
+      setMsg("bad", "Falta configurar la URL HTTP de Power Automate dentro del archivo HTML.");
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = "Enviando...";
+    const payload = formToPayload();
+    try {
+      // mode:no-cors evita bloqueos CORS comunes en GitHub Pages contra Power Automate.
+      // El flujo recibirá el cuerpo como texto JSON.
+      await fetch(POWER_AUTOMATE_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(payload)
+      });
+      setMsg("ok", "Registro enviado. Muchas gracias por completar la asistencia.");
+      form.reset();
+      cargarIdAcomp();
+      cargarUgel("");
+    } catch (err) {
+      console.error(err);
+      setMsg("bad", "No se pudo enviar el registro. Verifica la conexión o la URL del flujo.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Enviar asistencia";
+    }
+  });
+
+  form.addEventListener("reset", () => setTimeout(() => { cargarIdAcomp(); cargarUgel(""); }, 0));
+
+  cargarDre();
+  cargarIdAcomp();
+</script>
+</body>
+</html>
